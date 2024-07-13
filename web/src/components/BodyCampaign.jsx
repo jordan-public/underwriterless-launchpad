@@ -15,7 +15,7 @@ function BodyCampaign({ signer, address, nativeSymbol }) {
     const [name, setName] = React.useState('')
     const [launchAmount, setLaunchAmount] = React.useState(0n)
     const [duration, setDuration] = React.useState(30)
-
+    const [token, setToken] = React.useState('')
 
     React.useEffect(() => {
         if (!signer) return;
@@ -27,9 +27,12 @@ function BodyCampaign({ signer, address, nativeSymbol }) {
 
     const onLaunch = async () => {
         try{
-            const tx = await onChainInfo.cLaunchpad.launchToken(symbol, name, priceLow, priceHigh, oneWay, launchAmount, duration, { gasLimit: ethers.parseUnits('10000000', 'wei') });
+            const tx = await onChainInfo.cLaunchpad.launchToken(symbol, name, priceLow, priceHigh, oneWay, launchAmount, BigInt(duration) * 24n * 60n * 60n, { gasLimit: ethers.parseUnits('10000000', 'wei') });
             const r = await tx.wait()
             window.alert('Completed. Block hash: ' + r.blockHash);
+            const tokenAddress = await onChainInfo.cLaunchpad.lastToken();
+            setToken(tokenAddress); // !!! Not safe - others may create tokens in the meantime
+console.log("lastToken created", tokenAddress)
         } catch(e) {
             window.alert(e.message + "\n" + (e.data?e.data.message:""))
         }
@@ -66,6 +69,7 @@ function BodyCampaign({ signer, address, nativeSymbol }) {
             </FormControl>
             <Button color='black' bg='red' size='lg' onClick={onLaunch}>Launch</Button>
         </VStack>
+        <Text>Last Token Address: {token}</Text>
     </OnChainContext.Provider>);
 }
 

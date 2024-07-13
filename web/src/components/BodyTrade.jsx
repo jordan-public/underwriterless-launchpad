@@ -16,6 +16,9 @@ function BodyTrade({ signer, address, nativeSymbol }) {
         (async () => {
             const cLaunchpad = new ethers.Contract(aLaunchpad.contractAddress, aLaunchpad.abi, signer);
             setOnChainInfo({signer: signer, address: address, cLaunchpad: cLaunchpad });
+            const tokenAddress = await cLaunchpad.lastToken();
+            setToken(tokenAddress); // !!! Change this to allow selection of token
+console.log("lastToken", tokenAddress)
         }) ();
     }, [signer, address]);
 
