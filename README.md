@@ -29,7 +29,9 @@ When liquidity is deployed in our protocol, all of it consists of the asset $X$ 
 
 $L_{lpad} = c \cdot \frac{x_{lpad} \cdot \sqrt{P_{low}}}{P_{high} - P_{low}}$
 
-so $c = \frac{L_{lpad}}{x_{lpad}} \cdot \frac{P_{high} - P_{low}}{\sqrt{P_{low}}}$ (1)
+so 
+
+$c = \frac{L_{lpad}}{x_{lpad}} \cdot \frac{P_{high} - P_{low}}{\sqrt{P_{low}}}$ (1)
 
 We can discover the constant $c$ as soon as we deploy our liquidity.
 If anyone buys the token $X$ the price will fall into the range, 
@@ -39,13 +41,12 @@ so the liquidity be:
 $L_{lpad} = c \cdot \frac{x_{lpad} \cdot \sqrt{P_{current}} \cdot (P_{high} - P_{current})}{P_{high}} = c \cdot \frac{y_{lpad} \cdot \sqrt{P_{current}} \cdot (P_{current} - P_{low})}{P_{low}}$
 
 so 
+
 $c = \frac{L_{lpad}}{x_{lpad}} \cdot \frac{P_{high}}{\sqrt{P_{current}} \cdot (P_{high} - P_{current})}$ (2)
 
 and if the price hits the upper limit of the range (all Tokens are sold):
 
-$
-L_{lpad} = c \cdot \frac{y_{lpad} \cdot \sqrt{P_{high}}}{P_{high} - P_{low}}
-$
+$L_{lpad} = c \cdot \frac{y_{lpad} \cdot \sqrt{P_{high}}}{P_{high} - P_{low}}$
 
 so 
 
