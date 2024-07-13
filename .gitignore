@@ -1,1 +1,26 @@
-.DS_Store
+# Compiler files
+cache/
+out/
+
+# broadcast/*/*/*
+# !broadcast/*/*/run-latest.json
+# Ignores development broadcast logs
+!/broadcast
+/broadcast/*/8453/
+/broadcast/*/31337/
+/broadcast/*/1/
+/broadcast/**/dry-run/
+
+# Docs
+docs/
+
+# Dotenv file
+.env
+
+**/.DS_Store
+
+web/src/artifacts/*
+!web/src/artifacts/.gitkeep
+
+tmp/*
+!tmp/.gitkeep
