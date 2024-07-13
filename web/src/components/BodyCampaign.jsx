@@ -8,8 +8,8 @@ import {bigIntToDecimal, decimalToBigInt} from '../utils/decimal';
 
 function BodyCampaign({ signer, address, nativeSymbol }) {
     const [onChainInfo, setOnChainInfo] = React.useState({})
-    const [priceLow, setPriceLow] = React.useState(0n)
-    const [priceHigh, setPriceHigh] = React.useState(0n)
+    const [priceLow, setPriceLow] = React.useState(1.0)
+    const [priceHigh, setPriceHigh] = React.useState(1.1)
     const [oneWay, setOneWay] = React.useState(false)
     const [symbol, setSymbol] = React.useState('')
     const [name, setName] = React.useState('')
@@ -27,7 +27,9 @@ function BodyCampaign({ signer, address, nativeSymbol }) {
 
     const onLaunch = async () => {
         try{
-            const tx = await onChainInfo.cLaunchpad.launchToken(symbol, name, priceLow, priceHigh, oneWay, launchAmount, BigInt(duration) * 24n * 60n * 60n, { gasLimit: ethers.parseUnits('10000000', 'wei') });
+            const pLow = BitInt(Math.sqrt(parseFloat(priceLow)) * 2**96);
+            const pHigh = BitInt(Math.sqrt(parseFloat(priceHigh)) * 2**96);
+            const tx = await onChainInfo.cLaunchpad.launchToken(symbol, name, pLow, pHigh, oneWay, launchAmount, BigInt(duration) * 24n * 60n * 60n, { gasLimit: ethers.parseUnits('10000000', 'wei') });
             const r = await tx.wait()
             window.alert('Completed. Block hash: ' + r.blockHash);
             const tokenAddress = await onChainInfo.cLaunchpad.lastToken();
@@ -57,9 +59,9 @@ console.log("lastToken created", tokenAddress)
             </FormControl>
             <FormControl>
                 <FormLabel>Token Price Range ({nativeSymbol})</FormLabel>
-                <Input value={bigIntToDecimal(priceLow).toString()} onChange={e => setPriceLow(decimalToBigInt(e.target.value))} type='number' />
+                <Input value={priceLow} onChange={e => setPriceLow(e.target.value)} type='number' />
                 <br/> <br/>
-                <Input value={bigIntToDecimal(priceHigh).toString()} onChange={e => setPriceHigh(decimalToBigInt(e.target.value))} type='number' />
+                <Input value={priceHigh} onChange={e => setPriceHigh(e.target.value)} type='number' />
                 <br/> <br/>
                 <Checkbox isChecked={oneWay} onChange={(e) => setOneWay(e.target.checked)}>One Way</Checkbox>  
             </FormControl>

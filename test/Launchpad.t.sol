@@ -1,5 +1,5 @@
 // SPDX-License-Identifier: BUSL-1.1
-pragma solidity ^0.8.13;
+pragma solidity ^0.8.26;
 
 import {Test, console} from "forge-std/Test.sol";
 import {Launchpad} from "../src/Launchpad.sol";
@@ -10,7 +10,7 @@ contract LaunchpadTest is Test {
     Launchpad public launchpad;
 
     function setUp() public {
-        IToken baseToken = new Token("Wrapped test ETH", "WETH");
+        IToken baseToken = new Token("Wrapped test ETH", "WETH", 1 * 10**6 * 10**18 /* 1M */);
         launchpad = new Launchpad(baseToken);
 
     }
