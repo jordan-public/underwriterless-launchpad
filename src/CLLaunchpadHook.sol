@@ -25,11 +25,11 @@ contract CLLaunchpadHook is CLBaseHook {
             Permissions({
                 beforeInitialize: false,
                 afterInitialize: false,
-                beforeAddLiquidity: true,
-                afterAddLiquidity: true,
+                beforeAddLiquidity: false,
+                afterAddLiquidity: false,
                 beforeRemoveLiquidity: false,
                 afterRemoveLiquidity: false,
-                beforeSwap: true,
+                beforeSwap: false,
                 afterSwap: true,
                 beforeDonate: false,
                 afterDonate: false,
@@ -39,37 +39,6 @@ contract CLLaunchpadHook is CLBaseHook {
                 afterRemoveLiquidityReturnsDelta: false
             })
         );
-    }
-
-    function beforeAddLiquidity(
-        address,
-        PoolKey calldata key,
-        ICLPoolManager.ModifyLiquidityParams calldata,
-        bytes calldata
-    ) external override poolManagerOnly returns (bytes4) {
-        beforeAddLiquidityCount[key.toId()]++;
-        return this.beforeAddLiquidity.selector;
-    }
-
-    function afterAddLiquidity(
-        address,
-        PoolKey calldata key,
-        ICLPoolManager.ModifyLiquidityParams calldata,
-        BalanceDelta,
-        bytes calldata
-    ) external override poolManagerOnly returns (bytes4, BalanceDelta) {
-        afterAddLiquidityCount[key.toId()]++;
-        return (this.afterAddLiquidity.selector, BalanceDeltaLibrary.ZERO_DELTA);
-    }
-
-    function beforeSwap(address, PoolKey calldata key, ICLPoolManager.SwapParams calldata, bytes calldata)
-        external
-        override
-        poolManagerOnly
-        returns (bytes4, BeforeSwapDelta, uint24)
-    {
-        beforeSwapCount[key.toId()]++;
-        return (this.beforeSwap.selector, BeforeSwapDeltaLibrary.ZERO_DELTA, 0);
     }
 
     function afterSwap(address, PoolKey calldata key, ICLPoolManager.SwapParams calldata, BalanceDelta, bytes calldata)
