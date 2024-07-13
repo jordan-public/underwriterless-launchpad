@@ -7,4 +7,5 @@ interface ILaunchpad {
     function sell(address tokenAddress, uint128 amount) external;
     function lastToken() external view returns (address);
     function finishCampaign(address tokenAddress) external;
+    function proxyCollect(uint256 tokenId) external;
 }

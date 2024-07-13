@@ -1,6 +1,7 @@
 // SPDX-License-Identifier: BUSL-1.1
 pragma solidity ^0.8.26;
 
+import "forge-std/console.sol";
 import "./interfaces/ILaunchpad.sol";
 import "@openzeppelin/contracts/token/ERC20/ERC20.sol";
 import "./interfaces/IToken.sol";
@@ -34,14 +35,23 @@ contract Launchpad is ILaunchpad{
     using CLPoolParametersHelper for bytes32;
 
     IToken[] public tokens;
-    mapping (address => PoolKey) keys;
-    mapping (address => uint128) liquiditiesPerToken;
-    mapping (address => uint256) liquidityIdsPerToken;
-    mapping (address => address) liquidityOwners;
+    mapping (address => PoolKey) public keys;
+    mapping (address => uint128) public liquiditiesPerToken;
+    mapping (address => uint256) public liquidityIdsPerToken;
+    mapping (address => address) public liquidityOwners;
+
+    CLLaunchpadHook hook;
 
     constructor(IToken _baseToken) {
         owner = msg.sender;
         baseToken = _baseToken;
+
+        // Initialize PancakeSwap Pool
+        vault = new Vault();
+        poolManager = new CLPoolManager(vault, 500000);
+        vault.registerApp(address(poolManager));
+        nfp = new NonfungiblePositionManager(vault, poolManager, address(0), address(0));
+        swapRouter = new CLSwapRouter(vault, poolManager, address(0));
     }
 
     function launchToken(string memory symbol, string memory name, uint160 priceLow, uint160 priceHigh, bool oneWay, uint256 launchAmount, uint256 duration) external returns (address tokenAddress) {
@@ -52,14 +62,6 @@ contract Launchpad is ILaunchpad{
         lastToken = tokenAddress; // For convenience
 
         liquidityOwners[tokenAddress] = msg.sender;
-
-        // Initialize PancakeSwap Pool
-        vault = new Vault();
-        poolManager = new CLPoolManager(vault, 500000);
-        vault.registerApp(address(poolManager));
-
-        nfp = new NonfungiblePositionManager(vault, poolManager, address(0), address(0));
-        swapRouter = new CLSwapRouter(vault, poolManager, address(0));
 
         // Add liquidity
         address[2] memory approvalAddress = [address(nfp), address(swapRouter)];
@@ -73,7 +75,7 @@ contract Launchpad is ILaunchpad{
 
         (Currency currency0, Currency currency1) = (Currency.wrap(a0), Currency.wrap(a1));
 
-        CLLaunchpadHook hook = new CLLaunchpadHook(poolManager);
+        hook = new CLLaunchpadHook(poolManager, nfp);
 
         // create the pool key
         PoolKey memory key = PoolKey({
@@ -94,14 +96,17 @@ contract Launchpad is ILaunchpad{
         int24 tickLower = TickMath.getTickAtSqrtRatio(priceLow);
         int24 tickUpper = TickMath.getTickAtSqrtRatio(priceHigh);
 
+        tickLower /= 10; tickLower *= 10;
+        tickUpper /= 10; tickUpper *= 10;
+
         // Add liquidity
         INonfungiblePositionManager.MintParams memory mintParams = INonfungiblePositionManager.MintParams({
             poolKey: key,
             tickLower: order ? tickLower : tickUpper,
             tickUpper: order ? tickUpper : tickLower,
             salt: bytes32(0),
-            amount0Desired: order ? launchAmount : 0,
-            amount1Desired: order ? 0 : launchAmount,
+            amount0Desired: order ? 0 : launchAmount,
+            amount1Desired: order ? launchAmount : 0,
             amount0Min: 0,
             amount1Min: 0,
             recipient: address(this),
@@ -109,6 +114,8 @@ contract Launchpad is ILaunchpad{
         });
 
         (liquidityIdsPerToken[address(token)], liquiditiesPerToken[address(token)], , ) = nfp.mint(mintParams);
+        hook.setTokenId(liquidityIdsPerToken[address(token)]);
+        hook.setOwner(address(this));
     }
 
     function buy(address tokenAddress, uint128 amount) external {
@@ -153,7 +160,6 @@ contract Launchpad is ILaunchpad{
             })
         );
         
-
         // Send the assets to owner
         uint256 toSendToken = IToken(tokenAddress).balanceOf(address(this)) - balanceTokenBefore;
         uint256 toSendBase = baseToken.balanceOf(address(this)) - balanceBaseBefore;
@@ -163,5 +169,18 @@ contract Launchpad is ILaunchpad{
 
         // Destroy the LP
         // No need - there may be someone else holding this LP: nfp.burn(liquidityIdsPerToken[adress(token)]);
+    }
+
+    function proxyCollect(uint256 tokenId) external {
+        //require(msg.sender == address(hook), "Only owner can collect");
+console.log("proxyCollect nfp address", address(nfp));
+        nfp.collect(
+            INonfungiblePositionManager.CollectParams({
+                tokenId: tokenId,
+                recipient: owner,
+                amount0Max: 999999999999999999,
+                amount1Max: 999999999999999999
+            })
+        );
     }
 }
