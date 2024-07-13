@@ -24,4 +24,8 @@ contract Launchpad is ILaunchpad{
     function sell(address tokenAddress, uint256 amount) external {
         // !!! TBD
     }
+
+    function finishCampaign(address tokenAddress) external {
+        // !!! TBD
+    }
 }

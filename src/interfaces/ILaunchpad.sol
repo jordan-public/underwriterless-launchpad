@@ -6,4 +6,5 @@ interface ILaunchpad {
     function buy(address tokenAddress, uint256 amount) external;
     function sell(address tokenAddress, uint256 amount) external;
     function lastToken() external view returns (address);
+    function finishCampaign(address tokenAddress) external;
 }
