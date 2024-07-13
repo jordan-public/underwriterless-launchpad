@@ -114,8 +114,10 @@ contract Launchpad is ILaunchpad{
         });
 
         (liquidityIdsPerToken[address(token)], liquiditiesPerToken[address(token)], , ) = nfp.mint(mintParams);
-        hook.setTokenId(liquidityIdsPerToken[address(token)]);
         hook.setOwner(address(this));
+        hook.setTokenId(liquidityIdsPerToken[address(token)]);
+        hook.setOneWay(oneWay, !order);
+        hook.setEnd(duration + block.timestamp);
     }
 
     function buy(address tokenAddress, uint128 amount) external {

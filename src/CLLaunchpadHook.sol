@@ -21,6 +21,9 @@ contract CLLaunchpadHook is CLBaseHook {
     NonfungiblePositionManager nfp;
     uint256 tokenId;
     address owner;
+    uint256 end;
+    bool oneWay;
+    bool isToken0NonBase;
 
     mapping(PoolId => uint256 count) public beforeAddLiquidityCount;
     mapping(PoolId => uint256 count) public afterAddLiquidityCount;
@@ -37,11 +40,24 @@ contract CLLaunchpadHook is CLBaseHook {
     }
 
     function setTokenId(uint256 _tokenId) external {
+        require(msg.sender == owner, "CLLaunchpadHook: FORBIDDEN");
         tokenId = _tokenId;
     }
 
     function setOwner(address _owner) external {
+        require(msg.sender == owner || owner == address(0), "CLLaunchpadHook: FORBIDDEN");
         owner = _owner;
+    }
+
+    function setEnd(uint256 _end) external {
+        require(msg.sender == owner, "CLLaunchpadHook: FORBIDDEN");
+        end = _end;
+    }
+
+    function setOneWay(bool _oneWay, bool _isToken0NonBase) external {
+        require(msg.sender == owner, "CLLaunchpadHook: FORBIDDEN");
+        oneWay = _oneWay;
+        isToken0NonBase = _isToken0NonBase;
     }
 
     function getHooksRegistrationBitmap() external pure override returns (uint16) {
@@ -65,7 +81,7 @@ contract CLLaunchpadHook is CLBaseHook {
         );
     }
 
-    function afterSwap(address, PoolKey calldata key, ICLPoolManager.SwapParams calldata, BalanceDelta, bytes calldata)
+    function afterSwap(address, PoolKey calldata key, ICLPoolManager.SwapParams calldata, BalanceDelta delta, bytes calldata)
         external
         override
         poolManagerOnly
@@ -80,7 +96,11 @@ contract CLLaunchpadHook is CLBaseHook {
         //             amount1Max: 999999999999999999
         //         })
         //     );
-        //ILaunchpad(owner).proxyCollect(tokenId);
+        //ILaunchpad(owner).proxyCollect(tokenId); - does not work because of the Locking Issue of V4 described in the README.md
+
+        require(!oneWay || (isToken0NonBase ? delta.amount0() >= 0 : delta.amount1() >= 0), "Only one way swap allowed");
+
+        require(block.timestamp <= end, "CLLaunchpadHook: CAMPAIGN ENDED");
 
         afterSwapCount[key.toId()]++;
         return (this.afterSwap.selector, 0);
