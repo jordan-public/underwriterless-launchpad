@@ -62,7 +62,7 @@ Knowing what part of the total liquidity in the pool at any time belongs to the 
 - Initially we can calculate the factor $c$ as:
 $c_{init} = \frac{L_{lpad}}{x_{lpad}} \cdot \frac{P_{high} - P_{low}}{ \sqrt{P_{low}}}$
 
-- Then upon each withdrawal we update $c$ from the above formulas (1), (2) or (3) depending on the price. Then we can withdraw liquidity $L_{lpad} \cdot \frac{c_{old} - c_{new}}{c_{old}}$ .
+- Then upon each withdrawal we update $c$ from the above formulas (1), (2) or (3) depending on the price. Then we can withdraw the liquidity which resulted from fees $L_{lpad} \cdot \frac{c_{old} - c_{new}}{c_{old}}$ .
 
 ## Implementation
 
