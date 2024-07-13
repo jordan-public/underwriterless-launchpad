@@ -12,6 +12,7 @@ function BodyCampaign({ signer, address, nativeSymbol }) {
     const [priceHigh, setPriceHigh] = React.useState(0n)
     const [oneWay, setOneWay] = React.useState(false)
     const [symbol, setSymbol] = React.useState('')
+    const [name, setName] = React.useState('')
     const [launchAmount, setLaunchAmount] = React.useState(0n)
     const [duration, setDuration] = React.useState(30)
 
@@ -39,7 +40,7 @@ function BodyCampaign({ signer, address, nativeSymbol }) {
 
     const onLaunch = async () => {
         try{
-            const tx = await onChainInfo.cLaunchpad.launchToken(symbol, priceLow, priceHigh, oneWay, launchAmount, duration, { gasLimit: ethers.parseUnits('10000000', 'wei') });
+            const tx = await onChainInfo.cLaunchpad.launchToken(symbol, name, priceLow, priceHigh, oneWay, launchAmount, duration, { gasLimit: ethers.parseUnits('10000000', 'wei') });
             const r = await tx.wait()
             window.alert('Completed. Block hash: ' + r.blockHash);
         } catch(e) {
@@ -55,6 +56,10 @@ function BodyCampaign({ signer, address, nativeSymbol }) {
             <FormControl>
                 <FormLabel>Token Symbol</FormLabel>
                 <Input value={symbol} onChange={e => setSymbol(e.target.value)} />
+            </FormControl>
+            <FormControl>
+                <FormLabel>Token Name</FormLabel>
+                <Input value={name} onChange={e => setName(e.target.value)} />
             </FormControl>
             <FormControl>
                 <FormLabel>Launch Amount</FormLabel>
