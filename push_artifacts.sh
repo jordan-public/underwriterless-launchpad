@@ -2,7 +2,7 @@
 # Usage: ./push_artifacts.sh <chain_id>
 set -e
 
-rm web/src/artifacts/*.json
+rm -f web/src/artifacts/*.json
 
 # Ignore errors
 for dirname in out/*.sol; do
