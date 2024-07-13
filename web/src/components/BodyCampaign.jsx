@@ -2,7 +2,7 @@
 import React from 'react';
 import { Heading, FormControl, FormLabel, Select, Textarea, Text, VStack, HStack, Input, Button, Box, Checkbox } from '@chakra-ui/react';
 import { ethers } from 'ethers';
-//import aLaunchpad from '../artifacts/Launchpad.json';
+import aLaunchpad from '../artifacts/Launchpad.json';
 import OnChainContext from './OnChainContext';
 import {bigIntToDecimal, decimalToBigInt} from '../utils/decimal';
 
@@ -20,21 +20,8 @@ function BodyCampaign({ signer, address, nativeSymbol }) {
     React.useEffect(() => {
         if (!signer) return;
         (async () => {
-            let contractAddress = 0;
-            switch ((await signer.provider.getNetwork()).chainId) {
-                case 1n: contractAddress = "0x17eE56D300E3A0a6d5Fd9D56197bFfE968096EdB"; // Ethereum
-                break;
-                case 42161n: contractAddress = "0x17eE56D300E3A0a6d5Fd9D56197bFfE968096EdB"; // Arbitrum One
-                break;
-                case 8453n: contractAddress = "0x17eE56D300E3A0a6d5Fd9D56197bFfE968096EdB"; // Base
-                break;
-                case 5000n: contractAddress = "0x17eE56D300E3A0a6d5Fd9D56197bFfE968096EdB"; // Mantle
-                break;
-                case 10n: contractAddress = "0x17eE56D300E3A0a6d5Fd9D56197bFfE968096EdB"; // Optimism
-                break;
-            }
-            // const cLaunchpad = new ethers.Contract(contractAddress, aLaunchpad.abi, signer);
-            // setOnChainInfo({signer: signer, address: address, cLaunchpad: cLaunchpad });
+            const cLaunchpad = new ethers.Contract(aLaunchpad.contractAddress, aLaunchpad.abi, signer);
+            setOnChainInfo({signer: signer, address: address, cLaunchpad: cLaunchpad });
         }) ();
     }, [signer, address]);
 
@@ -49,7 +36,7 @@ function BodyCampaign({ signer, address, nativeSymbol }) {
     }
 
     if (!signer) return(<><br/>Please connect!</>)
-    //if (!onChainInfo.cLaunchpad) return("Please wait...")
+    if (!onChainInfo.cLaunchpad) return("Please wait...")
     return (<OnChainContext.Provider value={onChainInfo} >
         <VStack width='70%' p={4} align='center' borderRadius='md' shadow='lg' bg='black'>
             <Heading as="h3" size="md">Price Range for Launched Token</Heading>
