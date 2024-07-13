@@ -5,13 +5,13 @@ import { Box } from '@chakra-ui/react'
 
 import TitleBar from '@/components/TitleBar'
 import LinkBar from '@/components/LinkBar'
-import BodyTrade from '@/components/BodyTrade'
+import BodyCampaign from '@/components/BodyCampaign'
 
 export default function Home() {
   const [signer, setSigner] = React.useState(null);
   const [address, setAddress] = React.useState(null);
   const [symbol, setSymbol] = React.useState('');
-  const [focus, setFocus] = React.useState('trade');
+  const [focus, setFocus] = React.useState('campaign');
 
   return (<>
     <Head>
@@ -20,11 +20,11 @@ export default function Home() {
       <meta name="viewport" content="width=device-width, initial-scale=1" />
       <link rel="icon" href="/favicon.ico" />
     </Head>
-    <Box bg='gray.800' w='100%' h='100%' p={4} color='white' align='center'>
+    <Box bg='green.800' w='100%' h='100%' p={4} color='white' align='center'>
       <TitleBar setSigner={setSigner} address={address} setAddress={setAddress} setSymbol={setSymbol} />
       <LinkBar focus={focus} setFocus={setFocus} />
       <br/>
-      <BodyTrade signer={signer} address={address} nativeSymbol={symbol}/>
+      <BodyCampaign signer={signer} address={address} nativeSymbol={symbol}/>
     </Box>
   </>)
 }
