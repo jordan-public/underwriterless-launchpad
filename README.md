@@ -1,6 +1,10 @@
 # underwriterless-launchpad
 Fund your startup without an underwriter
 
+## Demo
+
+See demo [here](./demo/README.md).
+
 ## Abstract
 Startups have to approach Launchpad organizations which provide Underwriters for their initial liquidity of Tokens. No more - Underwriterless Launchped allows anyone to start a funcing campaign without an underwriter.
 
