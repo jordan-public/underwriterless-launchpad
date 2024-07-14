@@ -9,6 +9,7 @@ set -e
 forge script script/DeployAnywhere.s.sol:Deploy --rpc-url "http://127.0.0.1:8545/" --sender $SENDER --private-key $PRIVATE_KEY --broadcast -v
 
 ./push_artifacts.sh "DeployAnywhere.s.sol/31337"
+#./push_artifacts.sh "DeployAnywhere.s.sol/8453"
 
 # cd web
 # pnpm build

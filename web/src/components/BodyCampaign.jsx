@@ -6,7 +6,26 @@ import aLaunchpad from '../artifacts/Launchpad.json';
 import OnChainContext from './OnChainContext';
 import {bigIntToDecimal, decimalToBigInt} from '../utils/decimal';
 
-function BodyCampaign({ signer, address, nativeSymbol }) {
+function multiplyFloatByBigInt(floatNumber, bigIntMultiplier) {
+    const [integerPart, fractionalPart] = floatNumber.toString().split('.');
+  
+    // Convert integer part to BigInt
+    const integerPartBigInt = BigInt(integerPart);
+  
+    // Calculate the fractional part as BigInt
+    const fractionalMultiplier = BigInt(10 ** fractionalPart.length);
+    const fractionalPartBigInt = BigInt(fractionalPart) * bigIntMultiplier / fractionalMultiplier;
+  
+    // Multiply integer part by bigIntMultiplier
+    const integerResult = integerPartBigInt * bigIntMultiplier;
+  
+    // Sum the integer and fractional results
+    const result = integerResult + fractionalPartBigInt;
+  
+    return result;
+}
+
+  function BodyCampaign({ signer, address, nativeSymbol }) {
     const [onChainInfo, setOnChainInfo] = React.useState({})
     const [priceLow, setPriceLow] = React.useState(1.0)
     const [priceHigh, setPriceHigh] = React.useState(1.1)
@@ -16,6 +35,7 @@ function BodyCampaign({ signer, address, nativeSymbol }) {
     const [launchAmount, setLaunchAmount] = React.useState(0n)
     const [duration, setDuration] = React.useState(30)
     const [token, setToken] = React.useState('')
+    const [tokenAddressToFinish, setTokenAddressToFinish] = React.useState('')
 
     React.useEffect(() => {
         if (!signer) return;
@@ -27,14 +47,27 @@ function BodyCampaign({ signer, address, nativeSymbol }) {
 
     const onLaunch = async () => {
         try{
-            const pLow = BitInt(Math.sqrt(parseFloat(priceLow)) * 2**96);
-            const pHigh = BitInt(Math.sqrt(parseFloat(priceHigh)) * 2**96);
+            const pLow = multiplyFloatByBigInt(Math.sqrt(parseFloat(priceLow)), 2n**96n);
+            const pHigh = multiplyFloatByBigInt(Math.sqrt(parseFloat(priceHigh)), 2n**96n);
             const tx = await onChainInfo.cLaunchpad.launchToken(symbol, name, pLow, pHigh, oneWay, launchAmount, BigInt(duration) * 24n * 60n * 60n, { gasLimit: ethers.parseUnits('10000000', 'wei') });
             const r = await tx.wait()
             window.alert('Completed. Block hash: ' + r.blockHash);
             const tokenAddress = await onChainInfo.cLaunchpad.lastToken();
             setToken(tokenAddress); // !!! Not safe - others may create tokens in the meantime
-console.log("lastToken created", tokenAddress)
+        } catch(e) {
+            window.alert(e.message + "\n" + (e.data?e.data.message:""))
+        }
+    }
+
+    const onFinish = async () => {
+        try{
+            const pLow = multiplyFloatByBigInt(Math.sqrt(parseFloat(priceLow)), 2n**96n);
+            const pHigh = multiplyFloatByBigInt(Math.sqrt(parseFloat(priceHigh)), 2n**96n);
+            const tx = await onChainInfo.cLaunchpad.launchToken(symbol, name, pLow, pHigh, oneWay, launchAmount, BigInt(duration) * 24n * 60n * 60n, { gasLimit: ethers.parseUnits('10000000', 'wei') });
+            const r = await tx.wait()
+            window.alert('Completed. Block hash: ' + r.blockHash);
+            const tokenAddress = await onChainInfo.cLaunchpad.lastToken();
+            setToken(tokenAddress); // !!! Not safe - others may create tokens in the meantime
         } catch(e) {
             window.alert(e.message + "\n" + (e.data?e.data.message:""))
         }
@@ -72,6 +105,13 @@ console.log("lastToken created", tokenAddress)
             <Button color='black' bg='red' size='lg' onClick={onLaunch}>Launch</Button>
         </VStack>
         <Text>Last Token Address: {token}</Text>
+        <VStack width='70%' p={4} align='center' borderRadius='md' shadow='lg' bg='black'>
+            <FormControl>
+                <FormLabel>Token Address</FormLabel>
+                <Input value={tokenAddressToFinish} onChange={e => setTokenAddressToFinish(e.target.value)} />
+            </FormControl>
+            <Button color='black' bg='red' size='lg' onClick={onFinish}>Finish Campaign</Button>
+        </VStack>
     </OnChainContext.Provider>);
 }
 

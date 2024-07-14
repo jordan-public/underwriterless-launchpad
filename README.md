@@ -83,3 +83,15 @@ proceeds from the stock sold.
 
 In the future, the protocol may be enhanced with ability to revert the entire campaign if certain sales goal is not reached. This could be done by encapsulating each sale as NFT which wraps the stock purchased and record of the sale price, which could be unwrapped at will and sold back at the recorded price minus the fees already collected by the protocol.
 
+## Problems Encountered and Workarounds
+
+### Locks
+
+This problem manifests on both PancakeSwap V4 and Uniswap V4. Namely, a **Lock** is acquired before multiple operations can be performed. This lock is tied to a contract. The "Swap Router" (**swapRouter**) is holding this lock while actively swapping and throughout the Swap Hooks (in this case the callback "afterSwap"). Trying to "collect" the swap fees accrued requires locking of the contract **NonfungiblePositionManager** before releasing the Lock on
+**swapRouter**. 
+
+The workaround was to move collecting of the fees to the end of the Launchpad campaign.
+
+### Foundry / Anvil Compatibility
+
+Anvil complains that EIP-3855 is not supported, and "Contracts deployed with a Solidity version equal or higher than 0.8.20 might not work properly.", while PancakeSwap requires Solidity version later than 0.8.20 to compile. 

@@ -175,7 +175,6 @@ contract Launchpad is ILaunchpad{
 
     function proxyCollect(uint256 tokenId) external {
         //require(msg.sender == address(hook), "Only owner can collect");
-console.log("proxyCollect nfp address", address(nfp));
         nfp.collect(
             INonfungiblePositionManager.CollectParams({
                 tokenId: tokenId,
