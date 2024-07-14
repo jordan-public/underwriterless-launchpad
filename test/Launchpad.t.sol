@@ -17,10 +17,6 @@ contract LaunchpadTest is Test {
         launchpad = new Launchpad(baseToken);
     }
 
-    function testSucceed() public {
-        assert(true);
-    }
-
     function testLaunchToken() public {
         // /* address tokenAddress =*/ launchpad.launchToken("TEST", "Test", 1 * 2**96, 10 * 2**96, false, 1 * 10**6 * 10**18, 100);
         /* address tokenAddress =*/ launchpad.launchToken("TEST", "Test", Constants.SQRT_RATIO_1_1 / 1000, Constants.SQRT_RATIO_1_1 / 10, false, 1 * 10**6 * 10**18, 100);
