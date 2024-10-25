@@ -1,4 +1,4 @@
-[This project](https://ethglobal.com/showcase/underwriterless-lpad-ajssq) was created at the [ETHGlobal Brussels 2024](https://ethglobal.com/events/brussels) hackathon. It did not win prizes and was left unfinished as I discovered a design flaw in Uniswap V4 and Pancakeswap V4, as described in the "Locks" section below. Uniswap V4 imminently changed the design from multiple locks to single lock afterwards, jst before the release.
+[This project](https://ethglobal.com/showcase/underwriterless-lpad-ajssq) was created at the [ETHGlobal Brussels 2024](https://ethglobal.com/events/brussels) hackathon. It did not win prizes and was left unfinished as I discovered a design flaw in Uniswap V4 and Pancakeswap V4, as described in the "Locks" section below. Uniswap V4 imminently changed the design from multiple locks to single lock afterwards, just before the release.
 
 # underwriterless-launchpad
 Fund your startup without an underwriter
